@@ -1,8 +1,6 @@
 import pytest
 import sys
 import os
-
-# Ensure the app module can be found
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.main import app
@@ -20,13 +18,14 @@ def test_health_endpoint(client):
     assert data['status'] == 'healthy'
     assert 'app' in data
     assert 'timestamp' in data
+    assert 'cache' in data  # will be 'miss' in tests
 
 def test_status_endpoint(client):
     response = client.get('/status')
     assert response.status_code == 200
     data = response.get_json()
     assert 'app' in data
-    assert 'version' in data
+    assert 'redis' in data  # shows redis connection status
 
 def test_index_endpoint(client):
     response = client.get('/')
