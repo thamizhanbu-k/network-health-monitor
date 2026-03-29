@@ -1,0 +1,23 @@
+# k8s/ingress.yaml
+# NOTE: Requires nginx-ingress controller installed separately
+# For local Minikube: minikube addons enable ingress
+# For production EKS: install nginx-ingress via Helm
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: health-monitor-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: health-monitor.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: health-monitor-service
+            port:
+              number: 80
