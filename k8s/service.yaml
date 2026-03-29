@@ -1,0 +1,30 @@
+# Flask APP SERVICE
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: health-monitor-service
+  namespace: default
+spec:
+  selector:
+    app: health-monitor
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
+  type: NodePort
+
+---
+# REDIS SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: default
+spec:
+  selector:
+    app: redis
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
