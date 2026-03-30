@@ -9,12 +9,13 @@ graph TD
     Developer([Developer]) -->|git push| GitHub[GitHub Repository]
     
     subgraph CI_CD_Pipelines [CI/CD Pipelines]
-        GitHub -->|Webhook trigger| GitHubActions[GitHub Actions\nCloud CI]
         GitHub -->|Poll/Webhook| Jenkins[Jenkins\nLocal CI/CD]
+        GitHub -->|Webhook trigger| GitHubActions[GitHub Actions\nCloud CI]
     end
     
-    GitHubActions -->|docker push| DockerHub[(DockerHub Registry)]
     Jenkins -->|docker push| DockerHub
+    GitHubActions -->|docker push| DockerHub[(DockerHub Registry)]
+    
     
     subgraph Local_K8s [Local Kubernetes - Minikube]
         Jenkins -->|kubectl apply| K8sAPI[K8s API Server]
