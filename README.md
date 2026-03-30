@@ -1,6 +1,6 @@
 # 🌐 Network Node Health Monitor
 
-A robust REST API built with Python (Flask) and Redis that monitors system health metrics. This project demonstrates a production-grade, end-to-end CI/CD pipeline featuring multi-stage Docker containerization, Kubernetes orchestration, and dual-pipeline automation (Jenkins & GitHub Actions).
+A cloud-native REST API built with Python (Flask) and Redis that monitors system health metrics — inspired by real-world network node monitoring from telecom operations. Demonstrates production-grade DevOps practices including multi-stage containerization, Kubernetes orchestration, and dual CI/CD pipeline automation.
 
 ## 🏗️ System Architecture
 
@@ -8,15 +8,15 @@ A robust REST API built with Python (Flask) and Redis that monitors system healt
 graph TD
     Developer([Developer]) -->|git push| GitHub[GitHub Repository]
     
-    subgraph CI/CD Pipelines
-        GitHub -->|Webhook| GitHubActions[GitHub Actions <br/> Cloud CI]
-        GitHub -->|Poll/Push| Jenkins[Jenkins <br/> Local CI/CD]
+    subgraph CI_CD_Pipelines [CI/CD Pipelines]
+        GitHub -->|Webhook trigger| GitHubActions[GitHub Actions\nCloud CI]
+        GitHub -->|Poll/Webhook| Jenkins[Jenkins\nLocal CI/CD]
     end
     
     GitHubActions -->|docker push| DockerHub[(DockerHub Registry)]
     Jenkins -->|docker push| DockerHub
     
-    subgraph Local Kubernetes Cluster Minikube
+    subgraph Local_K8s [Local Kubernetes - Minikube]
         Jenkins -->|kubectl apply| K8sAPI[K8s API Server]
         K8sAPI --> Deployment[Flask App Deployment]
         Deployment --> Pod1(Python Pod 1)
@@ -25,12 +25,20 @@ graph TD
         K8sAPI --> RedisDeploy[Redis Deployment]
         RedisDeploy --> RedisPod(Redis Cache Pod)
         
-        ConfigMap[K8s ConfigMap] -.->|Env Vars| Pod1
-        Secret[K8s Secret] -.->|API Keys| Pod1
+        ConfigMap[ConfigMap] -.->|env vars| Pod1
+        Secret[Secret] -.->|credentials| Pod1
         
-        Pod1 <-->|Cache Check| RedisPod
+        Pod1 <-->|cache| RedisPod
     end
+    
+    DockerHub -.->|image pull| Deployment
 ```
+
+## 📋 Prerequisites
+* Python 3.11+
+* Docker + Docker Compose
+* Minikube + `kubectl`
+* Jenkins (Running as a local Docker container)
 
 ## 💻 Tech Stack
 * **Application:** Python (Flask), Redis (Caching)
@@ -46,6 +54,29 @@ graph TD
 | `/` | GET | Welcome message and available endpoints. |
 | `/health` | GET | System health metrics (disk, memory) and cache status. |
 | `/status` | GET | Application version and uptime monitoring. |
+
+## 📊 Sample Response
+```json
+{
+  "app": "Network Health Monitor",
+  "cache": "miss",
+  "disk": {
+    "available": "45G",
+    "total": "59G",
+    "usage_percent": "24%",
+    "used": "11G"
+  },
+  "environment": "production",
+  "memory": {
+    "free": "2.1G",
+    "total": "7.7G",
+    "used": "4.2G"
+  },
+  "status": "healthy",
+  "timestamp": "2026-03-30T14:23:45.123456",
+  "version": "1.0.0"
+}
+```
 
 ## 🚀 Dual CI/CD Pipeline Workflows
 
@@ -63,7 +94,8 @@ This project implements two separate CI/CD strategies to demonstrate both local 
 2. Code is checked out and Python 3.11 is provisioned.
 3. Tests are executed via `pytest`.
 4. Multi-stage Docker image is built and tagged securely with the `github.sha` (for rollback traceability) and `latest`.
-5. Images are pushed to DockerHub, ready for a production cloud pull (e.g., AWS EKS).
+5. Images are pushed to DockerHub, ready for a production cloud pull.
+* **Note:** Direct K8s deployment from GitHub Actions requires a cloud cluster (e.g., AWS EKS) with a kubeconfig stored as a GitHub Secret. Local Minikube deployment for this project is handled natively by Jenkins.
 
 ## ☸️ Kubernetes Resources Handled
 * **Deployments:** Managing replicas for both the Python App and Redis.
@@ -73,14 +105,27 @@ This project implements two separate CI/CD strategies to demonstrate both local 
 
 ## 🛠️ Running Locally
 
-**Option 1: Raw Python**
-```bash
-pip install -r requirements.txt
-python app/main.py
-```
-
-**Option 2: Docker Compose (Recommended)**
+### Option 1: Docker Compose (Quickstart)
 ```bash
 docker compose up -d
 curl http://localhost:5000/health
+```
+
+### Option 2: Kubernetes (Minikube)
+```bash
+minikube start --driver=docker
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/redis.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+minikube service health-monitor-service
+```
+
+### Option 3: Raw Python
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app/main.py
 ```
