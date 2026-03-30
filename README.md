@@ -1,6 +1,6 @@
 # 🌐 Network Node Health Monitor
 
-A cloud-native REST API built with Python (Flask) and Redis that monitors system health metrics — inspired by real-world network node monitoring from telecom operations. Demonstrates production-grade DevOps practices including multi-stage containerization, Kubernetes orchestration, and dual CI/CD pipeline automation.
+A cloud-native REST API built with Python (Flask) and Redis for real-time system health monitoring. Designed with enterprise-scale reliability in mind, this project demonstrates production-grade DevOps practices including multi-stage containerization, Kubernetes orchestration, and automated dual CI/CD pipelines.
 
 ## 🏗️ System Architecture
 
