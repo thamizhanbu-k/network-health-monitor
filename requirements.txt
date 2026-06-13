@@ -3,3 +3,4 @@ psutil==5.9.8
 pytest==7.4.0
 requests==2.31.0
 redis==5.0.1
+prometheus-client==0.20.0

@@ -15,6 +15,8 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
+    networks:
+      - health-network
 
   redis:
     image: redis:7-alpine
@@ -22,7 +24,35 @@ services:
     ports:
       - '6379:6379'
     restart: unless-stopped
+    networks:
+      - health-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: health-prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - health-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: health-grafana
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - health-network
 
 networks:
-  default:
+  health-network:
     name: health-monitor-network
