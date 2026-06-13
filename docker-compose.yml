@@ -47,6 +47,8 @@ services:
       - '3000:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
     restart: unless-stopped
@@ -56,3 +58,6 @@ services:
 networks:
   health-network:
     name: health-monitor-network
+
+volumes:
+  grafana-data:
