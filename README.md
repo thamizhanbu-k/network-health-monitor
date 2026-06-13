@@ -47,6 +47,7 @@ graph TD
 * **Orchestration:** Kubernetes (Minikube, Deployments, Services, ConfigMaps, Secrets)
 * **CI/CD (Local):** Jenkins (Pipeline as Code, Docker-in-Docker)
 * **CI/CD (Cloud):** GitHub Actions
+* **Monitoring:** Prometheus, Grafana
 
 ## 🔌 API Endpoints
 
@@ -56,7 +57,22 @@ graph TD
 | `/health` | GET | System health metrics (disk, memory) and cache status. |
 | `/status` | GET | Application version and uptime monitoring. |
 
-## 📊 Sample Response
+## 📊 Monitoring Stack
+
+| Tool | Purpose | URL |
+|---|---|---|
+| Prometheus | Metrics collection | http://localhost:9090 |
+| Grafana | Metrics visualization | http://localhost:3000 |
+
+**Metrics exposed at `/metrics`:**
+- `health_monitor_requests_total` — request counter by endpoint
+- `health_monitor_request_duration_seconds` — request latency histogram
+- `health_monitor_cache_hits_total` — Redis cache hits
+- `health_monitor_cache_misses_total` — Redis cache misses
+- `health_monitor_disk_usage_percent` — disk usage gauge
+- `health_monitor_memory_used_gb` — memory usage gauge
+
+## 📋 Sample Response
 ```json
 {
   "app": "Network Health Monitor",
